@@ -48,7 +48,7 @@ export function SetAbsoluteVolumeForm(props: Props) {
       navigationTitle={`Set ${props.target.name} Volume`}
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Set Absolute dB" onSubmit={onSubmit} />
+          <Action.SubmitForm title="Set Absolute Volume" onSubmit={onSubmit} />
         </ActionPanel>
       }
     >

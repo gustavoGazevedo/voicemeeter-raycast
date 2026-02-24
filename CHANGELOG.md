@@ -1,5 +1,13 @@
 # Voicemeeter Control Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- ESLint: replace `require()` with ES module imports in voicemeeter.ts
+- ESLint: fix empty catch blocks in voicemeeter.ts
+- Action title "Set Absolute dB" renamed to "Set Absolute Volume" for title case
+
 ## [Initial Release] - {PR_MERGE_DATE}
 
 - Mute Channels: toggle, mute, and unmute Voicemeeter strips and buses

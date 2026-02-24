@@ -84,12 +84,12 @@ export default function Command() {
     return (
       <>
         <Action
-          title={`Increase ${settings.increaseStep} dB`}
+          title={`Increase by ${settings.increaseStep} dB`}
           shortcut={increaseShortcut}
           onAction={() => handleStep(target, settings.increaseStep)}
         />
         <Action
-          title={`Decrease ${settings.decreaseStep} dB`}
+          title={`Decrease by ${settings.decreaseStep} dB`}
           shortcut={decreaseShortcut}
           onAction={() => handleStep(target, -settings.decreaseStep)}
         />

@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import path from "node:path";
 import { getEffectiveSettings } from "./settings";
 import {
   createTargetIdentityKeys,
@@ -12,8 +13,7 @@ import {
   VoicemeeterTarget,
 } from "./types";
 
-const koffi = require("koffi");
-const path = require("path");
+import koffi from "koffi";
 
 type NativeApi = {
   VBVMR_Login: () => number;
@@ -68,7 +68,9 @@ function loadApiFromLib(lib: ReturnType<typeof koffi.load>): NativeApi {
     api.VBVMR_SetParameters = lib.func(
       "long VBVMR_SetParameters(const char *params)",
     );
-  } catch {}
+  } catch {
+    void 0;
+  }
   return api;
 }
 
@@ -89,14 +91,18 @@ function getNativeApi(executablePath?: string): NativeApi | undefined {
       const lib = koffi.load(dllPath);
       cachedApi = loadApiFromLib(lib);
       return cachedApi;
-    } catch {}
+    } catch {
+      void 0;
+    }
   }
 
   try {
     const lib = koffi.load("VoicemeeterRemote");
     cachedApi = loadApiFromLib(lib);
     return cachedApi;
-  } catch {}
+  } catch {
+    void 0;
+  }
 
   return undefined;
 }

@@ -156,6 +156,7 @@
     "postbuild": "npm install --prefix dist --omit=dev --omit=peer && node scripts/sync-to-extensions.js",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
-    "lint": "ray lint"
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
   }
 }
