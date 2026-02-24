@@ -7,11 +7,17 @@ function targetKey(target: VoicemeeterTarget): string {
   return `${target.kind}:index:${target.index}`;
 }
 
-export function isHidden(target: VoicemeeterTarget, hidden: Set<string>): boolean {
+export function isHidden(
+  target: VoicemeeterTarget,
+  hidden: Set<string>,
+): boolean {
   return hidden.has(targetKey(target));
 }
 
-export function filterVisible<T extends VoicemeeterTarget>(targets: T[], hidden: Set<string>): T[] {
+export function filterVisible<T extends VoicemeeterTarget>(
+  targets: T[],
+  hidden: Set<string>,
+): T[] {
   return targets.filter((t) => !hidden.has(targetKey(t)));
 }
 
@@ -30,7 +36,9 @@ export async function saveHidden(hidden: Set<string>): Promise<void> {
   await LocalStorage.setItem(HIDDEN_KEY, JSON.stringify([...hidden]));
 }
 
-export async function toggleHidden(target: VoicemeeterTarget): Promise<boolean> {
+export async function toggleHidden(
+  target: VoicemeeterTarget,
+): Promise<boolean> {
   const hid = await loadHidden();
   const key = targetKey(target);
   if (hid.has(key)) {

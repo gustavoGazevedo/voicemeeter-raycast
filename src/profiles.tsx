@@ -1,8 +1,20 @@
-import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Color,
+  Icon,
+  List,
+  showToast,
+  Toast,
+} from "@raycast/api";
 import React, { useCallback, useEffect, useState } from "react";
 import { ProfileForm } from "./components/ProfileForm";
 import { QuickSettingsForm } from "./components/QuickSettingsForm";
-import { applyProfile, launchVoicemeeterFromSettings, undoLastChange } from "./lib/controller";
+import {
+  applyProfile,
+  launchVoicemeeterFromSettings,
+  undoLastChange,
+} from "./lib/controller";
 import { notifyAction } from "./lib/feedback";
 import { deleteProfile, listProfiles, saveProfile } from "./lib/profiles";
 import { useEffectiveSettings } from "./lib/use-settings";
@@ -61,11 +73,19 @@ export default function Command() {
   }
 
   return (
-    <List isLoading={isLoading || isProfilesLoading} navigationTitle="Profiles" searchBarPlaceholder="Filter profiles...">
+    <List
+      isLoading={isLoading || isProfilesLoading}
+      navigationTitle="Profiles"
+      searchBarPlaceholder="Filter profiles..."
+    >
       <List.Section title="Connection">
         <List.Item
           title={state.connected ? "Connected" : "Disconnected"}
-          subtitle={state.connected ? `${state.capabilities.edition} detected` : state.error ?? "Voicemeeter unavailable"}
+          subtitle={
+            state.connected
+              ? `${state.capabilities.edition} detected`
+              : (state.error ?? "Voicemeeter unavailable")
+          }
           icon={{
             source: state.connected ? Icon.CheckCircle : Icon.CircleDisabled,
             tintColor: state.connected ? Color.Green : Color.Orange,
@@ -79,7 +99,11 @@ export default function Command() {
             <ActionPanel>
               <Action title="Refresh" onAction={refreshEverything} />
               <Action title="Launch Voicemeeter" onAction={handleLaunch} />
-              <Action.Push title="Quick Settings" target={<QuickSettingsForm onSaved={refreshEverything} />} icon={Icon.Gear} />
+              <Action.Push
+                title="Quick Settings"
+                target={<QuickSettingsForm onSaved={refreshEverything} />}
+                icon={Icon.Gear}
+              />
             </ActionPanel>
           }
         />
@@ -92,8 +116,20 @@ export default function Command() {
           icon={Icon.Plus}
           actions={
             <ActionPanel>
-              <Action.Push title="Create Profile" target={<ProfileForm targets={state.targets} onSubmitProfile={handleSaveProfile} />} />
-              <Action.Push title="Quick Settings" target={<QuickSettingsForm onSaved={refreshEverything} />} icon={Icon.Gear} />
+              <Action.Push
+                title="Create Profile"
+                target={
+                  <ProfileForm
+                    targets={state.targets}
+                    onSubmitProfile={handleSaveProfile}
+                  />
+                }
+              />
+              <Action.Push
+                title="Quick Settings"
+                target={<QuickSettingsForm onSaved={refreshEverything} />}
+                icon={Icon.Gear}
+              />
               <Action title="Refresh" onAction={refreshEverything} />
             </ActionPanel>
           }
@@ -113,15 +149,35 @@ export default function Command() {
             ]}
             actions={
               <ActionPanel>
-                <Action title="Apply Profile" onAction={() => handleApplyProfile(profile)} />
+                <Action
+                  title="Apply Profile"
+                  onAction={() => handleApplyProfile(profile)}
+                />
                 <Action.Push
                   title="Edit Profile"
-                  target={<ProfileForm profile={profile} targets={state.targets} onSubmitProfile={handleSaveProfile} />}
+                  target={
+                    <ProfileForm
+                      profile={profile}
+                      targets={state.targets}
+                      onSubmitProfile={handleSaveProfile}
+                    />
+                  }
                 />
-                <Action title="Delete Profile" onAction={() => handleDeleteProfile(profile)} style={Action.Style.Destructive} />
-                <Action title={`Undo Last Change (${undoCount})`} onAction={handleUndo} />
+                <Action
+                  title="Delete Profile"
+                  onAction={() => handleDeleteProfile(profile)}
+                  style={Action.Style.Destructive}
+                />
+                <Action
+                  title={`Undo Last Change (${undoCount})`}
+                  onAction={handleUndo}
+                />
                 <Action title="Refresh" onAction={refreshEverything} />
-                <Action.Push title="Quick Settings" target={<QuickSettingsForm onSaved={refreshEverything} />} icon={Icon.Gear} />
+                <Action.Push
+                  title="Quick Settings"
+                  target={<QuickSettingsForm onSaved={refreshEverything} />}
+                  icon={Icon.Gear}
+                />
               </ActionPanel>
             }
           />

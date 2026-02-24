@@ -1,7 +1,12 @@
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import React from "react";
 import { QuickSettingsForm } from "./components/QuickSettingsForm";
-import { launchVoicemeeterFromSettings, setTargetMute, toggleTargetMute, undoLastChange } from "./lib/controller";
+import {
+  launchVoicemeeterFromSettings,
+  setTargetMute,
+  toggleTargetMute,
+  undoLastChange,
+} from "./lib/controller";
 import { notifyAction } from "./lib/feedback";
 import { isFavorite, sortWithFavoritesFirst } from "./lib/favorites";
 import { filterVisible, isHidden } from "./lib/hidden";
@@ -11,12 +16,16 @@ import { useHidden } from "./lib/use-hidden";
 import { useVoicemeeterState } from "./lib/use-vm-state";
 import { VoicemeeterTarget } from "./lib/types";
 
-function sectionTargets(targets: VoicemeeterTarget[], kind: "strip" | "bus"): VoicemeeterTarget[] {
+function sectionTargets(
+  targets: VoicemeeterTarget[],
+  kind: "strip" | "bus",
+): VoicemeeterTarget[] {
   return targets.filter((target) => target.kind === kind);
 }
 
 export default function Command() {
-  const { state, isLoading, undoCount, refresh, applyCacheUpdate } = useVoicemeeterState();
+  const { state, isLoading, undoCount, refresh, applyCacheUpdate } =
+    useVoicemeeterState();
   const { settings, refreshSettings } = useEffectiveSettings();
   const { favorites, toggleFavorite } = useFavorites();
   const { hidden, toggleHidden } = useHidden();
@@ -58,8 +67,14 @@ export default function Command() {
     await refreshEverything();
   }
 
-  const strips = filterVisible(sortWithFavoritesFirst(sectionTargets(state.targets, "strip"), favorites), hidden);
-  const buses = filterVisible(sortWithFavoritesFirst(sectionTargets(state.targets, "bus"), favorites), hidden);
+  const strips = filterVisible(
+    sortWithFavoritesFirst(sectionTargets(state.targets, "strip"), favorites),
+    hidden,
+  );
+  const buses = filterVisible(
+    sortWithFavoritesFirst(sectionTargets(state.targets, "bus"), favorites),
+    hidden,
+  );
   const hiddenTargets = state.targets.filter((t) => isHidden(t, hidden));
 
   return (
@@ -71,7 +86,10 @@ export default function Command() {
       actions={
         <ActionPanel>
           <Action title="Refresh" onAction={refreshEverything} />
-          <Action title={`Undo Last Change (${undoCount})`} onAction={handleUndo} />
+          <Action
+            title={`Undo Last Change (${undoCount})`}
+            onAction={handleUndo}
+          />
           <Action title="Launch Voicemeeter" onAction={handleLaunch} />
           <Action.Push
             title="Quick Settings"
@@ -85,7 +103,11 @@ export default function Command() {
       <List.Section title="Connection">
         <List.Item
           title={state.connected ? "Connected" : "Disconnected"}
-          subtitle={state.connected ? `${state.capabilities.edition} detected` : state.error ?? "Voicemeeter unavailable"}
+          subtitle={
+            state.connected
+              ? `${state.capabilities.edition} detected`
+              : (state.error ?? "Voicemeeter unavailable")
+          }
           icon={{
             source: state.connected ? Icon.CheckCircle : Icon.CircleDisabled,
             tintColor: state.connected ? Color.Green : Color.Orange,
@@ -99,7 +121,11 @@ export default function Command() {
             <ActionPanel>
               <Action title="Refresh" onAction={refreshEverything} />
               <Action title="Launch Voicemeeter" onAction={handleLaunch} />
-              <Action.Push title="Quick Settings" target={<QuickSettingsForm onSaved={refreshEverything} />} icon={Icon.Gear} />
+              <Action.Push
+                title="Quick Settings"
+                target={<QuickSettingsForm onSaved={refreshEverything} />}
+                icon={Icon.Gear}
+              />
             </ActionPanel>
           }
         />
@@ -115,7 +141,12 @@ export default function Command() {
                 subtitle={`Gain ${target.gain.toFixed(2)} dB`}
                 accessories={[
                   ...(isFavorite(target, favorites)
-                    ? [{ icon: { source: Icon.Star, tintColor: Color.Yellow }, tooltip: "Favorite" }]
+                    ? [
+                        {
+                          icon: { source: Icon.Star, tintColor: Color.Yellow },
+                          tooltip: "Favorite",
+                        },
+                      ]
                     : []),
                   {
                     icon: {
@@ -127,18 +158,44 @@ export default function Command() {
                 ]}
                 actions={
                   <ActionPanel>
-                    {settings.muteBehavior !== "explicit-idempotent" ? <Action title="Toggle Mute" onAction={() => handleToggle(target)} /> : null}
-                    <Action title="Mute" onAction={() => handleExplicit(target, true)} />
-                    <Action title="Unmute" onAction={() => handleExplicit(target, false)} />
+                    {settings.muteBehavior !== "explicit-idempotent" ? (
+                      <Action
+                        title="Toggle Mute"
+                        onAction={() => handleToggle(target)}
+                      />
+                    ) : null}
                     <Action
-                      title={isFavorite(target, favorites) ? "Remove from Favorites" : "Add to Favorites"}
+                      title="Mute"
+                      onAction={() => handleExplicit(target, true)}
+                    />
+                    <Action
+                      title="Unmute"
+                      onAction={() => handleExplicit(target, false)}
+                    />
+                    <Action
+                      title={
+                        isFavorite(target, favorites)
+                          ? "Remove from Favorites"
+                          : "Add to Favorites"
+                      }
                       onAction={() => toggleFavorite(target)}
                       icon={Icon.Star}
                     />
-                    <Action title="Hide" onAction={() => toggleHidden(target)} icon={Icon.EyeDisabled} />
-                    <Action title={`Undo Last Change (${undoCount})`} onAction={handleUndo} />
+                    <Action
+                      title="Hide"
+                      onAction={() => toggleHidden(target)}
+                      icon={Icon.EyeDisabled}
+                    />
+                    <Action
+                      title={`Undo Last Change (${undoCount})`}
+                      onAction={handleUndo}
+                    />
                     <Action title="Refresh" onAction={refreshEverything} />
-                    <Action.Push title="Quick Settings" target={<QuickSettingsForm onSaved={refreshEverything} />} icon={Icon.Gear} />
+                    <Action.Push
+                      title="Quick Settings"
+                      target={<QuickSettingsForm onSaved={refreshEverything} />}
+                      icon={Icon.Gear}
+                    />
                   </ActionPanel>
                 }
               />
@@ -152,7 +209,12 @@ export default function Command() {
                 subtitle={`Gain ${target.gain.toFixed(2)} dB`}
                 accessories={[
                   ...(isFavorite(target, favorites)
-                    ? [{ icon: { source: Icon.Star, tintColor: Color.Yellow }, tooltip: "Favorite" }]
+                    ? [
+                        {
+                          icon: { source: Icon.Star, tintColor: Color.Yellow },
+                          tooltip: "Favorite",
+                        },
+                      ]
                     : []),
                   {
                     icon: {
@@ -164,18 +226,44 @@ export default function Command() {
                 ]}
                 actions={
                   <ActionPanel>
-                    {settings.muteBehavior !== "explicit-idempotent" ? <Action title="Toggle Mute" onAction={() => handleToggle(target)} /> : null}
-                    <Action title="Mute" onAction={() => handleExplicit(target, true)} />
-                    <Action title="Unmute" onAction={() => handleExplicit(target, false)} />
+                    {settings.muteBehavior !== "explicit-idempotent" ? (
+                      <Action
+                        title="Toggle Mute"
+                        onAction={() => handleToggle(target)}
+                      />
+                    ) : null}
                     <Action
-                      title={isFavorite(target, favorites) ? "Remove from Favorites" : "Add to Favorites"}
+                      title="Mute"
+                      onAction={() => handleExplicit(target, true)}
+                    />
+                    <Action
+                      title="Unmute"
+                      onAction={() => handleExplicit(target, false)}
+                    />
+                    <Action
+                      title={
+                        isFavorite(target, favorites)
+                          ? "Remove from Favorites"
+                          : "Add to Favorites"
+                      }
                       onAction={() => toggleFavorite(target)}
                       icon={Icon.Star}
                     />
-                    <Action title="Hide" onAction={() => toggleHidden(target)} icon={Icon.EyeDisabled} />
-                    <Action title={`Undo Last Change (${undoCount})`} onAction={handleUndo} />
+                    <Action
+                      title="Hide"
+                      onAction={() => toggleHidden(target)}
+                      icon={Icon.EyeDisabled}
+                    />
+                    <Action
+                      title={`Undo Last Change (${undoCount})`}
+                      onAction={handleUndo}
+                    />
                     <Action title="Refresh" onAction={refreshEverything} />
-                    <Action.Push title="Quick Settings" target={<QuickSettingsForm onSaved={refreshEverything} />} icon={Icon.Gear} />
+                    <Action.Push
+                      title="Quick Settings"
+                      target={<QuickSettingsForm onSaved={refreshEverything} />}
+                      icon={Icon.Gear}
+                    />
                   </ActionPanel>
                 }
               />
@@ -192,7 +280,12 @@ export default function Command() {
                 subtitle={`Gain ${target.gain.toFixed(2)} dB`}
                 accessories={[
                   ...(isFavorite(target, favorites)
-                    ? [{ icon: { source: Icon.Star, tintColor: Color.Yellow }, tooltip: "Favorite" }]
+                    ? [
+                        {
+                          icon: { source: Icon.Star, tintColor: Color.Yellow },
+                          tooltip: "Favorite",
+                        },
+                      ]
                     : []),
                   {
                     icon: {
@@ -204,18 +297,44 @@ export default function Command() {
                 ]}
                 actions={
                   <ActionPanel>
-                    {settings.muteBehavior !== "explicit-idempotent" ? <Action title="Toggle Mute" onAction={() => handleToggle(target)} /> : null}
-                    <Action title="Mute" onAction={() => handleExplicit(target, true)} />
-                    <Action title="Unmute" onAction={() => handleExplicit(target, false)} />
+                    {settings.muteBehavior !== "explicit-idempotent" ? (
+                      <Action
+                        title="Toggle Mute"
+                        onAction={() => handleToggle(target)}
+                      />
+                    ) : null}
                     <Action
-                      title={isFavorite(target, favorites) ? "Remove from Favorites" : "Add to Favorites"}
+                      title="Mute"
+                      onAction={() => handleExplicit(target, true)}
+                    />
+                    <Action
+                      title="Unmute"
+                      onAction={() => handleExplicit(target, false)}
+                    />
+                    <Action
+                      title={
+                        isFavorite(target, favorites)
+                          ? "Remove from Favorites"
+                          : "Add to Favorites"
+                      }
                       onAction={() => toggleFavorite(target)}
                       icon={Icon.Star}
                     />
-                    <Action title="Hide" onAction={() => toggleHidden(target)} icon={Icon.EyeDisabled} />
-                    <Action title={`Undo Last Change (${undoCount})`} onAction={handleUndo} />
+                    <Action
+                      title="Hide"
+                      onAction={() => toggleHidden(target)}
+                      icon={Icon.EyeDisabled}
+                    />
+                    <Action
+                      title={`Undo Last Change (${undoCount})`}
+                      onAction={handleUndo}
+                    />
                     <Action title="Refresh" onAction={refreshEverything} />
-                    <Action.Push title="Quick Settings" target={<QuickSettingsForm onSaved={refreshEverything} />} icon={Icon.Gear} />
+                    <Action.Push
+                      title="Quick Settings"
+                      target={<QuickSettingsForm onSaved={refreshEverything} />}
+                      icon={Icon.Gear}
+                    />
                   </ActionPanel>
                 }
               />
@@ -229,7 +348,12 @@ export default function Command() {
                 subtitle={`Gain ${target.gain.toFixed(2)} dB`}
                 accessories={[
                   ...(isFavorite(target, favorites)
-                    ? [{ icon: { source: Icon.Star, tintColor: Color.Yellow }, tooltip: "Favorite" }]
+                    ? [
+                        {
+                          icon: { source: Icon.Star, tintColor: Color.Yellow },
+                          tooltip: "Favorite",
+                        },
+                      ]
                     : []),
                   {
                     icon: {
@@ -241,18 +365,44 @@ export default function Command() {
                 ]}
                 actions={
                   <ActionPanel>
-                    {settings.muteBehavior !== "explicit-idempotent" ? <Action title="Toggle Mute" onAction={() => handleToggle(target)} /> : null}
-                    <Action title="Mute" onAction={() => handleExplicit(target, true)} />
-                    <Action title="Unmute" onAction={() => handleExplicit(target, false)} />
+                    {settings.muteBehavior !== "explicit-idempotent" ? (
+                      <Action
+                        title="Toggle Mute"
+                        onAction={() => handleToggle(target)}
+                      />
+                    ) : null}
                     <Action
-                      title={isFavorite(target, favorites) ? "Remove from Favorites" : "Add to Favorites"}
+                      title="Mute"
+                      onAction={() => handleExplicit(target, true)}
+                    />
+                    <Action
+                      title="Unmute"
+                      onAction={() => handleExplicit(target, false)}
+                    />
+                    <Action
+                      title={
+                        isFavorite(target, favorites)
+                          ? "Remove from Favorites"
+                          : "Add to Favorites"
+                      }
                       onAction={() => toggleFavorite(target)}
                       icon={Icon.Star}
                     />
-                    <Action title="Hide" onAction={() => toggleHidden(target)} icon={Icon.EyeDisabled} />
-                    <Action title={`Undo Last Change (${undoCount})`} onAction={handleUndo} />
+                    <Action
+                      title="Hide"
+                      onAction={() => toggleHidden(target)}
+                      icon={Icon.EyeDisabled}
+                    />
+                    <Action
+                      title={`Undo Last Change (${undoCount})`}
+                      onAction={handleUndo}
+                    />
                     <Action title="Refresh" onAction={refreshEverything} />
-                    <Action.Push title="Quick Settings" target={<QuickSettingsForm onSaved={refreshEverything} />} icon={Icon.Gear} />
+                    <Action.Push
+                      title="Quick Settings"
+                      target={<QuickSettingsForm onSaved={refreshEverything} />}
+                      icon={Icon.Gear}
+                    />
                   </ActionPanel>
                 }
               />
@@ -271,7 +421,11 @@ export default function Command() {
               icon={Icon.EyeDisabled}
               actions={
                 <ActionPanel>
-                  <Action title="Show" onAction={() => toggleHidden(target)} icon={Icon.Eye} />
+                  <Action
+                    title="Show"
+                    onAction={() => toggleHidden(target)}
+                    icon={Icon.Eye}
+                  />
                   <Action title="Refresh" onAction={refreshEverything} />
                 </ActionPanel>
               }
@@ -282,4 +436,3 @@ export default function Command() {
     </List>
   );
 }
-

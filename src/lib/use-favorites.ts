@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { loadFavorites, toggleFavorite as toggleFavoriteStorage } from "./favorites";
+import {
+  loadFavorites,
+  toggleFavorite as toggleFavoriteStorage,
+} from "./favorites";
 import { VoicemeeterTarget } from "./types";
 
 export function useFavorites() {

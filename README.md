@@ -1,26 +1,34 @@
-# Voicemeeter Raycast Extension
+# Voicemeeter Control
 
-Raycast extension for Voicemeeter strip and bus control on Windows.
+Control Voicemeeter strips and buses from Raycast on Windows.
+
+## Requirements
+
+- **Windows** (Voicemeeter is Windows-only)
+- [Voicemeeter](https://vb-audio.com/Voicemeeter/) installed and running
+- Raycast
 
 ## Commands
 
-- `Mute`: toggle, mute, and unmute with selectable stale-state behavior.
-- `Volume`: quick step controls (`+1`, `+0.5`, `-0.5`, `-1`) and absolute dB input.
-- `Profiles`: global presets with per-target overrides.
-- `Status`: connection status and current mute/volume snapshot.
+- **Mute Channels**: Toggle, mute, or unmute strips and buses with selectable stale-state behavior
+- **Adjust Volume**: Quick step controls and absolute dB input
+- **Manage Profiles**: Create and apply global presets with per-target overrides
+- **View Status**: Connection status and current mute/volume snapshot
 
 ## Setup
 
-1. Install dependencies:
-   - `npm install`
-2. Start development:
-   - `npm run dev`
-3. In Raycast:
-   - Set extension preferences as needed.
-   - Use in-command quick settings to adjust mute behavior, undo TTL, and executable path.
+1. Install and run Voicemeeter (Basic, Banana, or Potato).
+2. Add the extension in Raycast and configure preferences if needed.
+3. Use in-command Quick Settings to adjust mute behavior, undo TTL, and executable path.
+
+## Preferences
+
+- **Mute Behavior**: How mute actions behave when state may be stale (optimistic toggle, refresh then toggle, or explicit idempotent)
+- **Undo TTL**: Seconds until undo expires
+- **Voicemeeter Executable Path**: Path to Voicemeeter for launch actions (e.g. `C:\Program Files\VB\Voicemeeter\voicemeeter8.exe`)
+- **Volume Steps**: dB values for increase/decrease
+- **Section Order**: Strips first or buses first in lists
 
 ## Notes
 
-- Windows-only.
-- Uses Voicemeeter Remote API through `ffi-napi`.
-- No background daemon process.
+- Uses the Voicemeeter Remote API via native bindings (koffi). No background daemon required.

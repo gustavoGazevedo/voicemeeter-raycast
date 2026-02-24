@@ -9,6 +9,9 @@
   "platforms": [
     "Windows"
   ],
+  "categories": [
+    "System"
+  ],
   "external": [
     "koffi",
     "react"
@@ -16,29 +19,29 @@
   "commands": [
     {
       "name": "mute",
-      "title": "Voicemeeter Mute",
-      "subtitle": "Mute / Unmute Channels",
+      "title": "Mute Channels",
+      "subtitle": "Voicemeeter",
       "description": "Toggle, mute, or unmute Voicemeeter strips and buses.",
       "mode": "view"
     },
     {
       "name": "volume",
-      "title": "Voicemeeter Volume",
-      "subtitle": "Step or Absolute dB",
+      "title": "Adjust Volume",
+      "subtitle": "Voicemeeter",
       "description": "Adjust Voicemeeter volume by quick steps or absolute values.",
       "mode": "view"
     },
     {
       "name": "profiles",
-      "title": "Voicemeeter Profiles",
-      "subtitle": "Global + Per-Target Presets",
+      "title": "Manage Profiles",
+      "subtitle": "Voicemeeter",
       "description": "Create and apply Voicemeeter volume and mute profiles.",
       "mode": "view"
     },
     {
       "name": "status",
-      "title": "Voicemeeter Status",
-      "subtitle": "Connection and Snapshot",
+      "title": "View Status",
+      "subtitle": "Voicemeeter",
       "description": "Show Voicemeeter connection status and current target state.",
       "mode": "view"
     }
@@ -136,7 +139,7 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.95.2",
+    "@raycast/api": "^1.104.0",
     "koffi": "^2.10.0"
   },
   "peerDependencies": {
@@ -149,7 +152,7 @@
     "typescript": "^5.7.2"
   },
   "scripts": {
-    "build": "ray build --skip-types -e dist -o dist",
+    "build": "ray build -e dist -o dist",
     "postbuild": "npm install --prefix dist --omit=dev --omit=peer && node scripts/sync-to-extensions.js",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",

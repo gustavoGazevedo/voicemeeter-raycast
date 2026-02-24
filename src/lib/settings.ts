@@ -1,6 +1,12 @@
 import { getPreferenceValues } from "@raycast/api";
 import { readJson, writeJson } from "./storage";
-import { EffectiveSettings, MuteBehavior, QuickSettings, SectionOrder, VolumePrimaryAction } from "./types";
+import {
+  EffectiveSettings,
+  MuteBehavior,
+  QuickSettings,
+  SectionOrder,
+  VolumePrimaryAction,
+} from "./types";
 
 const QUICK_SETTINGS_KEY = "vm.quick-settings.v1";
 
@@ -52,7 +58,9 @@ export async function loadQuickSettings(): Promise<QuickSettings> {
   return readJson<QuickSettings>(QUICK_SETTINGS_KEY, {});
 }
 
-export async function saveQuickSettings(settings: QuickSettings): Promise<void> {
+export async function saveQuickSettings(
+  settings: QuickSettings,
+): Promise<void> {
   await writeJson<QuickSettings>(QUICK_SETTINGS_KEY, settings);
 }
 
@@ -60,13 +68,28 @@ export async function getEffectiveSettings(): Promise<EffectiveSettings> {
   const preferences = getPreferenceValues<ExtensionPreferences>();
   const quick = await loadQuickSettings();
 
-  const muteBehavior = quick.muteBehavior ?? asMuteBehavior(preferences.muteBehavior);
-  const undoTtlSeconds = asUndoSeconds(quick.undoTtlSeconds ?? preferences.undoTtlSeconds);
-  const executable = (quick.voicemeeterExecutablePath ?? preferences.voicemeeterExecutablePath)?.trim();
-  const increaseStep = asStep(quick.increaseStep ?? preferences.increaseStep, 1);
-  const decreaseStep = asStep(quick.decreaseStep ?? preferences.decreaseStep, 1);
-  const volumePrimaryAction = asVolumePrimaryAction(quick.volumePrimaryAction ?? preferences.volumePrimaryAction);
-  const sectionOrder = asSectionOrder(quick.sectionOrder ?? preferences.sectionOrder);
+  const muteBehavior =
+    quick.muteBehavior ?? asMuteBehavior(preferences.muteBehavior);
+  const undoTtlSeconds = asUndoSeconds(
+    quick.undoTtlSeconds ?? preferences.undoTtlSeconds,
+  );
+  const executable = (
+    quick.voicemeeterExecutablePath ?? preferences.voicemeeterExecutablePath
+  )?.trim();
+  const increaseStep = asStep(
+    quick.increaseStep ?? preferences.increaseStep,
+    1,
+  );
+  const decreaseStep = asStep(
+    quick.decreaseStep ?? preferences.decreaseStep,
+    1,
+  );
+  const volumePrimaryAction = asVolumePrimaryAction(
+    quick.volumePrimaryAction ?? preferences.volumePrimaryAction,
+  );
+  const sectionOrder = asSectionOrder(
+    quick.sectionOrder ?? preferences.sectionOrder,
+  );
 
   return {
     muteBehavior,

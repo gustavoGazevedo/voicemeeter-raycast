@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { getUndoCount, loadState } from "./controller";
-import { applyFromVoicemeeter, mergeIntoState, setGain, setMute } from "./target-cache";
+import {
+  applyFromVoicemeeter,
+  mergeIntoState,
+  setGain,
+  setMute,
+} from "./target-cache";
 import type { CacheUpdate } from "./target-cache";
 import { VoicemeeterState } from "./types";
 
@@ -24,7 +29,10 @@ export function useVoicemeeterState() {
 
   const refresh = useCallback(async () => {
     setIsLoading(true);
-    const [nextState, nextUndoCount] = await Promise.all([loadState(), getUndoCount()]);
+    const [nextState, nextUndoCount] = await Promise.all([
+      loadState(),
+      getUndoCount(),
+    ]);
     applyFromVoicemeeter(nextState);
     setState(mergeIntoState(nextState));
     setUndoCount(nextUndoCount);

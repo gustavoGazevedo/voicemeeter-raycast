@@ -1,6 +1,9 @@
 export type TargetKind = "strip" | "bus";
 
-export type MuteBehavior = "optimistic-toggle" | "refresh-then-toggle" | "explicit-idempotent";
+export type MuteBehavior =
+  | "optimistic-toggle"
+  | "refresh-then-toggle"
+  | "explicit-idempotent";
 
 export interface VoicemeeterTarget {
   id: string;

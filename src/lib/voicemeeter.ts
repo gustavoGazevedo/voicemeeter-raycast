@@ -1,7 +1,16 @@
 import { spawn } from "node:child_process";
 import { getEffectiveSettings } from "./settings";
-import { createTargetIdentityKeys, buildTargetId, mergeTargetName } from "./target";
-import { TargetKind, VoicemeeterCapabilities, VoicemeeterState, VoicemeeterTarget } from "./types";
+import {
+  createTargetIdentityKeys,
+  buildTargetId,
+  mergeTargetName,
+} from "./target";
+import {
+  TargetKind,
+  VoicemeeterCapabilities,
+  VoicemeeterState,
+  VoicemeeterTarget,
+} from "./types";
 
 const koffi = require("koffi");
 const path = require("path");
@@ -21,22 +30,44 @@ let cachedApi: NativeApi | undefined;
 
 const DLL_PATHS = [
   "VoicemeeterRemote64",
-  path.join(process.env["ProgramFiles(x86)"] || "C:\\Program Files (x86)", "VB", "Voicemeeter", "VoicemeeterRemote64.dll"),
-  path.join(process.env.ProgramFiles || "C:\\Program Files", "VB", "Voicemeeter", "VoicemeeterRemote64.dll"),
+  path.join(
+    process.env["ProgramFiles(x86)"] || "C:\\Program Files (x86)",
+    "VB",
+    "Voicemeeter",
+    "VoicemeeterRemote64.dll",
+  ),
+  path.join(
+    process.env.ProgramFiles || "C:\\Program Files",
+    "VB",
+    "Voicemeeter",
+    "VoicemeeterRemote64.dll",
+  ),
 ];
 
 function loadApiFromLib(lib: ReturnType<typeof koffi.load>): NativeApi {
   const api: NativeApi = {
     VBVMR_Login: lib.func("long VBVMR_Login()"),
     VBVMR_Logout: lib.func("long VBVMR_Logout()"),
-    VBVMR_GetVoicemeeterType: lib.func("long VBVMR_GetVoicemeeterType(_Out_ long *ptr)"),
-    VBVMR_GetVoicemeeterVersion: lib.func("long VBVMR_GetVoicemeeterVersion(_Out_ long *ptr)"),
-    VBVMR_GetParameterFloat: lib.func("long VBVMR_GetParameterFloat(const char *name, _Out_ float *ptr)"),
-    VBVMR_SetParameterFloat: lib.func("long VBVMR_SetParameterFloat(const char *name, float value)"),
-    VBVMR_GetParameterStringA: lib.func("long VBVMR_GetParameterStringA(const char *name, _Out_ char *buf)"),
+    VBVMR_GetVoicemeeterType: lib.func(
+      "long VBVMR_GetVoicemeeterType(_Out_ long *ptr)",
+    ),
+    VBVMR_GetVoicemeeterVersion: lib.func(
+      "long VBVMR_GetVoicemeeterVersion(_Out_ long *ptr)",
+    ),
+    VBVMR_GetParameterFloat: lib.func(
+      "long VBVMR_GetParameterFloat(const char *name, _Out_ float *ptr)",
+    ),
+    VBVMR_SetParameterFloat: lib.func(
+      "long VBVMR_SetParameterFloat(const char *name, float value)",
+    ),
+    VBVMR_GetParameterStringA: lib.func(
+      "long VBVMR_GetParameterStringA(const char *name, _Out_ char *buf)",
+    ),
   };
   try {
-    api.VBVMR_SetParameters = lib.func("long VBVMR_SetParameters(const char *params)");
+    api.VBVMR_SetParameters = lib.func(
+      "long VBVMR_SetParameters(const char *params)",
+    );
   } catch {}
   return api;
 }
@@ -47,7 +78,10 @@ function getNativeApi(executablePath?: string): NativeApi | undefined {
   }
 
   const pathsToTry = executablePath
-    ? [path.join(path.dirname(executablePath), "VoicemeeterRemote64.dll"), ...DLL_PATHS]
+    ? [
+        path.join(path.dirname(executablePath), "VoicemeeterRemote64.dll"),
+        ...DLL_PATHS,
+      ]
     : DLL_PATHS;
 
   for (const dllPath of pathsToTry) {
@@ -67,7 +101,9 @@ function getNativeApi(executablePath?: string): NativeApi | undefined {
   return undefined;
 }
 
-function mapEdition(typeCode: number): Pick<VoicemeeterCapabilities, "edition" | "stripCount" | "busCount"> {
+function mapEdition(
+  typeCode: number,
+): Pick<VoicemeeterCapabilities, "edition" | "stripCount" | "busCount"> {
   if (typeCode === 1) {
     return { edition: "standard", stripCount: 3, busCount: 2 };
   }
@@ -148,7 +184,10 @@ class VoicemeeterClient {
     if (!api) {
       return false;
     }
-    const paramLower = parameterName.replace(/\.(Gain|Mute)$/, (_, m) => `.${m.toLowerCase()}`);
+    const paramLower = parameterName.replace(
+      /\.(Gain|Mute)$/,
+      (_, m) => `.${m.toLowerCase()}`,
+    );
     let rc = api.VBVMR_SetParameterFloat(paramLower, value);
     if (rc < 0) {
       rc = api.VBVMR_SetParameterFloat(parameterName, value);
@@ -229,12 +268,19 @@ if (typeof process !== "undefined") {
   process.on("SIGTERM", disconnectVoicemeeter);
 }
 
-function makeParameter(target: VoicemeeterTarget, field: "Mute" | "Gain" | "Label"): string {
+function makeParameter(
+  target: VoicemeeterTarget,
+  field: "Mute" | "Gain" | "Label",
+): string {
   const head = target.kind === "strip" ? "Strip" : "Bus";
   return `${head}[${target.index}].${field}`;
 }
 
-function detectCount(client: VoicemeeterClient, kind: TargetKind, max: number): number {
+function detectCount(
+  client: VoicemeeterClient,
+  kind: TargetKind,
+  max: number,
+): number {
   const head = kind === "strip" ? "Strip" : "Bus";
   let count = 0;
 
@@ -249,7 +295,11 @@ function detectCount(client: VoicemeeterClient, kind: TargetKind, max: number): 
   return count;
 }
 
-function buildTargets(client: VoicemeeterClient, kind: TargetKind, count: number): VoicemeeterTarget[] {
+function buildTargets(
+  client: VoicemeeterClient,
+  kind: TargetKind,
+  count: number,
+): VoicemeeterTarget[] {
   const targets: VoicemeeterTarget[] = [];
 
   for (let index = 0; index < count; index += 1) {
@@ -336,7 +386,9 @@ export async function readVoicemeeterState(): Promise<VoicemeeterState> {
   };
 }
 
-export async function readTargetCurrentMute(target: VoicemeeterTarget): Promise<boolean | undefined> {
+export async function readTargetCurrentMute(
+  target: VoicemeeterTarget,
+): Promise<boolean | undefined> {
   const client = await getSharedClient();
   if (!client) {
     return undefined;
@@ -349,7 +401,10 @@ export async function readTargetCurrentMute(target: VoicemeeterTarget): Promise<
   return raw >= 0.5;
 }
 
-export async function writeTargetMute(target: VoicemeeterTarget, mute: boolean): Promise<boolean> {
+export async function writeTargetMute(
+  target: VoicemeeterTarget,
+  mute: boolean,
+): Promise<boolean> {
   const client = await getSharedClient();
   if (!client) {
     return false;
@@ -362,7 +417,10 @@ export async function writeTargetMute(target: VoicemeeterTarget, mute: boolean):
   return ok;
 }
 
-export async function writeTargetGain(target: VoicemeeterTarget, gain: number): Promise<boolean> {
+export async function writeTargetGain(
+  target: VoicemeeterTarget,
+  gain: number,
+): Promise<boolean> {
   const client = await getSharedClient();
   if (!client) {
     return false;
@@ -375,7 +433,9 @@ export async function writeTargetGain(target: VoicemeeterTarget, gain: number): 
   return ok;
 }
 
-export async function launchVoicemeeter(executablePath: string): Promise<boolean> {
+export async function launchVoicemeeter(
+  executablePath: string,
+): Promise<boolean> {
   if (process.platform !== "win32") {
     return false;
   }

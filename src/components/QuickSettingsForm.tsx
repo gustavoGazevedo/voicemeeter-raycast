@@ -1,7 +1,19 @@
-import { Action, ActionPanel, Form, showToast, Toast, useNavigation } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Form,
+  showToast,
+  Toast,
+  useNavigation,
+} from "@raycast/api";
 import React, { useEffect, useState } from "react";
 import { loadQuickSettings, saveQuickSettings } from "../lib/settings";
-import { MuteBehavior, QuickSettings, SectionOrder, VolumePrimaryAction } from "../lib/types";
+import {
+  MuteBehavior,
+  QuickSettings,
+  SectionOrder,
+  VolumePrimaryAction,
+} from "../lib/types";
 
 interface FormValues {
   muteBehavior: MuteBehavior;
@@ -43,7 +55,14 @@ export function QuickSettingsForm(props: Props) {
 
     const incStep = Number(values.increaseStep);
     const decStep = Number(values.decreaseStep);
-    if (!Number.isFinite(incStep) || incStep < 0.1 || incStep > 12 || !Number.isFinite(decStep) || decStep < 0.1 || decStep > 12) {
+    if (
+      !Number.isFinite(incStep) ||
+      incStep < 0.1 ||
+      incStep > 12 ||
+      !Number.isFinite(decStep) ||
+      decStep < 0.1 ||
+      decStep > 12
+    ) {
       await showToast({
         style: Toast.Style.Failure,
         title: "Volume steps must be between 0.1 and 12 dB.",
@@ -54,7 +73,8 @@ export function QuickSettingsForm(props: Props) {
     await saveQuickSettings({
       muteBehavior: values.muteBehavior,
       undoTtlSeconds: Math.round(undo),
-      voicemeeterExecutablePath: values.voicemeeterExecutablePath.trim() || undefined,
+      voicemeeterExecutablePath:
+        values.voicemeeterExecutablePath.trim() || undefined,
       increaseStep: Math.round(incStep * 100) / 100,
       decreaseStep: Math.round(decStep * 100) / 100,
       volumePrimaryAction: values.volumePrimaryAction,
@@ -82,13 +102,30 @@ export function QuickSettingsForm(props: Props) {
         </ActionPanel>
       }
     >
-      <Form.Dropdown id="muteBehavior" title="Mute Behavior" defaultValue={initialValues.muteBehavior ?? "optimistic-toggle"}>
-        <Form.Dropdown.Item value="optimistic-toggle" title="Optimistic Toggle" />
-        <Form.Dropdown.Item value="refresh-then-toggle" title="Refresh Then Toggle" />
-        <Form.Dropdown.Item value="explicit-idempotent" title="Explicit Idempotent" />
+      <Form.Dropdown
+        id="muteBehavior"
+        title="Mute Behavior"
+        defaultValue={initialValues.muteBehavior ?? "optimistic-toggle"}
+      >
+        <Form.Dropdown.Item
+          value="optimistic-toggle"
+          title="Optimistic Toggle"
+        />
+        <Form.Dropdown.Item
+          value="refresh-then-toggle"
+          title="Refresh Then Toggle"
+        />
+        <Form.Dropdown.Item
+          value="explicit-idempotent"
+          title="Explicit Idempotent"
+        />
       </Form.Dropdown>
 
-      <Form.TextField id="undoTtlSeconds" title="Undo TTL (seconds)" defaultValue={String(initialValues.undoTtlSeconds ?? 10)} />
+      <Form.TextField
+        id="undoTtlSeconds"
+        title="Undo TTL (seconds)"
+        defaultValue={String(initialValues.undoTtlSeconds ?? 10)}
+      />
       <Form.TextField
         id="voicemeeterExecutablePath"
         title="Voicemeeter Executable Path"

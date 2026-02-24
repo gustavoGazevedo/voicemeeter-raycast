@@ -3,14 +3,30 @@ import { makeId } from "./id";
 import { enqueueSerialized } from "./queue";
 import { getEffectiveSettings } from "./settings";
 import { MAX_GAIN_DB, MIN_GAIN_DB } from "./target";
-import { ActionResult, ProfileDefinition, VoicemeeterState, VoicemeeterTarget } from "./types";
-import { launchVoicemeeter, readTargetCurrentMute, readVoicemeeterState, writeTargetGain, writeTargetMute } from "./voicemeeter";
+import {
+  ActionResult,
+  ProfileDefinition,
+  VoicemeeterState,
+  VoicemeeterTarget,
+} from "./types";
+import {
+  launchVoicemeeter,
+  readTargetCurrentMute,
+  readVoicemeeterState,
+  writeTargetGain,
+  writeTargetMute,
+} from "./voicemeeter";
 
 function muteValue(mute: boolean): number {
   return mute ? 1 : 0;
 }
 
-async function pushHistoryMute(target: VoicemeeterTarget, before: boolean, after: boolean, ttlMs: number): Promise<void> {
+async function pushHistoryMute(
+  target: VoicemeeterTarget,
+  before: boolean,
+  after: boolean,
+  ttlMs: number,
+): Promise<void> {
   const now = Date.now();
   await addHistoryEntry({
     id: makeId(),
@@ -26,7 +42,12 @@ async function pushHistoryMute(target: VoicemeeterTarget, before: boolean, after
   });
 }
 
-async function pushHistoryGain(target: VoicemeeterTarget, before: number, after: number, ttlMs: number): Promise<void> {
+async function pushHistoryGain(
+  target: VoicemeeterTarget,
+  before: number,
+  after: number,
+  ttlMs: number,
+): Promise<void> {
   const now = Date.now();
   await addHistoryEntry({
     id: makeId(),
@@ -46,7 +67,9 @@ export async function loadState(): Promise<VoicemeeterState> {
   return readVoicemeeterState();
 }
 
-export async function toggleTargetMute(target: VoicemeeterTarget): Promise<ActionResult> {
+export async function toggleTargetMute(
+  target: VoicemeeterTarget,
+): Promise<ActionResult> {
   return enqueueSerialized(async () => {
     const settings = await getEffectiveSettings();
     let current = target.mute;
@@ -54,68 +77,120 @@ export async function toggleTargetMute(target: VoicemeeterTarget): Promise<Actio
     if (settings.muteBehavior === "refresh-then-toggle") {
       const fresh = await readTargetCurrentMute(target);
       if (fresh === undefined) {
-        return { ok: false, skipped: true, message: "Skipped: target unavailable." };
+        return {
+          ok: false,
+          skipped: true,
+          message: "Skipped: target unavailable.",
+        };
       }
       current = fresh;
     }
 
     if (settings.muteBehavior === "explicit-idempotent") {
-      return { ok: false, skipped: true, message: "Switch behavior to toggle or use explicit mute/unmute." };
+      return {
+        ok: false,
+        skipped: true,
+        message: "Switch behavior to toggle or use explicit mute/unmute.",
+      };
     }
 
     const next = !current;
     const changed = await writeTargetMute(target, next);
     if (!changed) {
-      return { ok: false, skipped: true, message: "Skipped: Voicemeeter unavailable." };
+      return {
+        ok: false,
+        skipped: true,
+        message: "Skipped: Voicemeeter unavailable.",
+      };
     }
 
     await pushHistoryMute(target, current, next, settings.undoTtlMs);
-    return { ok: true, message: `${target.name}: ${next ? "muted" : "unmuted"}.` };
+    return {
+      ok: true,
+      message: `${target.name}: ${next ? "muted" : "unmuted"}.`,
+    };
   });
 }
 
-export async function setTargetMute(target: VoicemeeterTarget, mute: boolean): Promise<ActionResult> {
+export async function setTargetMute(
+  target: VoicemeeterTarget,
+  mute: boolean,
+): Promise<ActionResult> {
   return enqueueSerialized(async () => {
     const settings = await getEffectiveSettings();
     const before = await readTargetCurrentMute(target);
     if (before === undefined) {
-      return { ok: false, skipped: true, message: "Skipped: target unavailable." };
+      return {
+        ok: false,
+        skipped: true,
+        message: "Skipped: target unavailable.",
+      };
     }
     if (before === mute) {
-      return { ok: true, message: `${target.name} already ${mute ? "muted" : "unmuted"}.` };
+      return {
+        ok: true,
+        message: `${target.name} already ${mute ? "muted" : "unmuted"}.`,
+      };
     }
 
     const changed = await writeTargetMute(target, mute);
     if (!changed) {
-      return { ok: false, skipped: true, message: "Skipped: Voicemeeter unavailable." };
+      return {
+        ok: false,
+        skipped: true,
+        message: "Skipped: Voicemeeter unavailable.",
+      };
     }
 
     await pushHistoryMute(target, before, mute, settings.undoTtlMs);
-    return { ok: true, message: `${target.name}: ${mute ? "muted" : "unmuted"}.` };
+    return {
+      ok: true,
+      message: `${target.name}: ${mute ? "muted" : "unmuted"}.`,
+    };
   });
 }
 
-export async function adjustTargetGain(target: VoicemeeterTarget, delta: number): Promise<ActionResult> {
-  const next = Math.max(MIN_GAIN_DB, Math.min(MAX_GAIN_DB, Math.round((target.gain + delta) * 100) / 100));
+export async function adjustTargetGain(
+  target: VoicemeeterTarget,
+  delta: number,
+): Promise<ActionResult> {
+  const next = Math.max(
+    MIN_GAIN_DB,
+    Math.min(MAX_GAIN_DB, Math.round((target.gain + delta) * 100) / 100),
+  );
   return setTargetGain(target, next);
 }
 
-export async function setTargetGain(target: VoicemeeterTarget, gain: number): Promise<ActionResult> {
+export async function setTargetGain(
+  target: VoicemeeterTarget,
+  gain: number,
+): Promise<ActionResult> {
   return enqueueSerialized(async () => {
     if (gain < MIN_GAIN_DB || gain > MAX_GAIN_DB || !Number.isFinite(gain)) {
-      return { ok: false, skipped: true, message: `Invalid value. Use ${MIN_GAIN_DB} to ${MAX_GAIN_DB} dB.` };
+      return {
+        ok: false,
+        skipped: true,
+        message: `Invalid value. Use ${MIN_GAIN_DB} to ${MAX_GAIN_DB} dB.`,
+      };
     }
 
     const settings = await getEffectiveSettings();
     const rounded = Math.round(gain * 100) / 100;
     const before = target.gain;
     if (Math.abs(before - rounded) < 0.001) {
-      return { ok: true, message: `${target.name} already ${rounded.toFixed(2)} dB.` };
+      return {
+        ok: true,
+        message: `${target.name} already ${rounded.toFixed(2)} dB.`,
+      };
     }
 
     const changed = await writeTargetGain(target, rounded);
     if (!changed) {
-      return { ok: false, skipped: true, message: "Skipped: Voicemeeter unavailable." };
+      return {
+        ok: false,
+        skipped: true,
+        message: "Skipped: Voicemeeter unavailable.",
+      };
     }
 
     await pushHistoryGain(target, before, rounded, settings.undoTtlMs);
@@ -123,13 +198,18 @@ export async function setTargetGain(target: VoicemeeterTarget, gain: number): Pr
   });
 }
 
-export async function applyProfile(profile: ProfileDefinition, targets: VoicemeeterTarget[]): Promise<ActionResult> {
+export async function applyProfile(
+  profile: ProfileDefinition,
+  targets: VoicemeeterTarget[],
+): Promise<ActionResult> {
   return enqueueSerialized(async () => {
     const settings = await getEffectiveSettings();
     let changedCount = 0;
 
     for (const target of targets) {
-      const override = target.identityKeys.map((key) => profile.overrides[key]).find(Boolean);
+      const override = target.identityKeys
+        .map((key) => profile.overrides[key])
+        .find(Boolean);
       const mute = override?.mute ?? profile.global.mute;
       const gain = override?.gain ?? profile.global.gain;
 
@@ -141,21 +221,38 @@ export async function applyProfile(profile: ProfileDefinition, targets: Voicemee
         }
       }
 
-      if (typeof gain === "number" && Number.isFinite(gain) && gain >= MIN_GAIN_DB && gain <= MAX_GAIN_DB) {
+      if (
+        typeof gain === "number" &&
+        Number.isFinite(gain) &&
+        gain >= MIN_GAIN_DB &&
+        gain <= MAX_GAIN_DB
+      ) {
         const normalized = Math.round(gain * 100) / 100;
         const ok = await writeTargetGain(target, normalized);
         if (ok) {
-          await pushHistoryGain(target, target.gain, normalized, settings.undoTtlMs);
+          await pushHistoryGain(
+            target,
+            target.gain,
+            normalized,
+            settings.undoTtlMs,
+          );
           changedCount += 1;
         }
       }
     }
 
     if (changedCount === 0) {
-      return { ok: false, skipped: true, message: "Skipped: profile had no applicable changes." };
+      return {
+        ok: false,
+        skipped: true,
+        message: "Skipped: profile had no applicable changes.",
+      };
     }
 
-    return { ok: true, message: `Applied profile "${profile.name}" (${changedCount} changes).` };
+    return {
+      ok: true,
+      message: `Applied profile "${profile.name}" (${changedCount} changes).`,
+    };
   });
 }
 
@@ -163,7 +260,11 @@ export async function undoLastChange(): Promise<ActionResult> {
   return enqueueSerialized(async () => {
     const item = await popUndoEntry();
     if (!item) {
-      return { ok: false, skipped: true, message: "No undo entries available." };
+      return {
+        ok: false,
+        skipped: true,
+        message: "No undo entries available.",
+      };
     }
 
     const target: VoicemeeterTarget = {
@@ -179,14 +280,22 @@ export async function undoLastChange(): Promise<ActionResult> {
     if (item.parameter === "mute") {
       const ok = await writeTargetMute(target, item.before >= 0.5);
       if (!ok) {
-        return { ok: false, skipped: true, message: "Skipped: Voicemeeter unavailable for undo." };
+        return {
+          ok: false,
+          skipped: true,
+          message: "Skipped: Voicemeeter unavailable for undo.",
+        };
       }
       return { ok: true, message: `${target.name}: mute undone.` };
     }
 
     const ok = await writeTargetGain(target, item.before);
     if (!ok) {
-      return { ok: false, skipped: true, message: "Skipped: Voicemeeter unavailable for undo." };
+      return {
+        ok: false,
+        skipped: true,
+        message: "Skipped: Voicemeeter unavailable for undo.",
+      };
     }
     return { ok: true, message: `${target.name}: gain undone.` };
   });
@@ -204,7 +313,11 @@ export async function launchVoicemeeterFromSettings(): Promise<ActionResult> {
   }
   const ok = await launchVoicemeeter(settings.voicemeeterExecutablePath);
   if (!ok) {
-    return { ok: false, skipped: true, message: "Failed to launch Voicemeeter." };
+    return {
+      ok: false,
+      skipped: true,
+      message: "Failed to launch Voicemeeter.",
+    };
   }
   return { ok: true, message: "Voicemeeter launch requested." };
 }

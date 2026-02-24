@@ -1,4 +1,11 @@
-import { Action, ActionPanel, Form, showToast, Toast, useNavigation } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Form,
+  showToast,
+  Toast,
+  useNavigation,
+} from "@raycast/api";
 import React from "react";
 import { setTargetGain } from "../lib/controller";
 import { notifyAction } from "../lib/feedback";
@@ -45,7 +52,11 @@ export function SetAbsoluteVolumeForm(props: Props) {
         </ActionPanel>
       }
     >
-      <Form.TextField id="gain" title="Target Gain (dB)" defaultValue={props.target.gain.toFixed(2)} />
+      <Form.TextField
+        id="gain"
+        title="Target Gain (dB)"
+        defaultValue={props.target.gain.toFixed(2)}
+      />
     </Form>
   );
 }

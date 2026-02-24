@@ -7,13 +7,16 @@ function targetKey(target: VoicemeeterTarget): string {
   return `${target.kind}:index:${target.index}`;
 }
 
-export function isFavorite(target: VoicemeeterTarget, favorites: Set<string>): boolean {
+export function isFavorite(
+  target: VoicemeeterTarget,
+  favorites: Set<string>,
+): boolean {
   return favorites.has(targetKey(target));
 }
 
 export function sortWithFavoritesFirst<T extends VoicemeeterTarget>(
   targets: T[],
-  favorites: Set<string>
+  favorites: Set<string>,
 ): T[] {
   return [...targets].sort((a, b) => {
     const aFav = favorites.has(targetKey(a));
@@ -39,7 +42,9 @@ export async function saveFavorites(favorites: Set<string>): Promise<void> {
   await LocalStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
 }
 
-export async function toggleFavorite(target: VoicemeeterTarget): Promise<boolean> {
+export async function toggleFavorite(
+  target: VoicemeeterTarget,
+): Promise<boolean> {
   const fav = await loadFavorites();
   const key = targetKey(target);
   if (fav.has(key)) {
