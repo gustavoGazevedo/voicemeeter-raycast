@@ -10,7 +10,11 @@
     "Windows"
   ],
   "categories": [
-    "System"
+    "System",
+    "Media",
+    "Productivity",
+    "Communication",
+    "Audio"
   ],
   "external": [
     "koffi",
