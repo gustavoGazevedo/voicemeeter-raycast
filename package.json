@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "voicemeeter",
+  "name": "voicemeeter-raycast",
   "title": "Voicemeeter Control",
   "description": "Control Voicemeeter strips and buses from Raycast.",
   "icon": "extension-icon.png",
