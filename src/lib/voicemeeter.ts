@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
+import { environment } from "@raycast/api";
 import { getEffectiveSettings } from "./settings";
 import {
   createTargetIdentityKeys,
@@ -13,7 +14,15 @@ import {
   VoicemeeterTarget,
 } from "./types";
 
-import koffi from "koffi";
+let koffi: any = null;
+
+const savedResourcesPath = (process as any).resourcesPath;
+try {
+  (process as any).resourcesPath = path.join(environment.assetsPath, "native");
+  koffi = require("koffi/indirect");
+} finally {
+  (process as any).resourcesPath = savedResourcesPath;
+}
 
 type NativeApi = {
   VBVMR_Login: () => number;

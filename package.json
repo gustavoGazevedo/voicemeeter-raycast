@@ -15,10 +15,6 @@
     "Productivity",
     "Communication"
   ],
-  "external": [
-    "koffi",
-    "react"
-  ],
   "commands": [
     {
       "name": "mute",
@@ -150,7 +146,7 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.104.0",
-    "koffi": "^2.10.0"
+    "koffi": "^2.15.1"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"
@@ -162,10 +158,11 @@
     "typescript": "^5.7.2"
   },
   "scripts": {
-    "build": "ray build -e dist -o dist",
+    "build": "ray build",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
-    "publish": "npx @raycast/api@latest publish"
+    "publish": "npx @raycast/api@latest publish",
+    "koffi": "node scripts/fetch-koffi.js"
   }
 }

@@ -21,7 +21,23 @@ interface Props {
   onSubmitProfile: (profile: ProfileDefinition) => Promise<void>;
 }
 
-type FormValues = Record<string, string | boolean>;
+type FormFieldValue = string | boolean | undefined;
+
+interface FormValues extends Record<string, FormFieldValue> {
+  name?: string;
+  globalMute?: string;
+  globalGain?: string;
+  includeConnections?: boolean;
+}
+
+interface DefaultValues {
+  name: string;
+  globalMute: string;
+  globalGain: string;
+  includeConnections: boolean;
+  muteByTargetId: Record<string, string>;
+  gainByTargetId: Record<string, string>;
+}
 
 function muteChoiceFromBool(value: boolean | undefined): string {
   if (value === true) {
@@ -43,27 +59,39 @@ function boolFromMuteChoice(choice: string): boolean | undefined {
   return undefined;
 }
 
+function stringValue(value: FormFieldValue): string {
+  return typeof value === "string" ? value : "";
+}
+
 export function ProfileForm(props: Props) {
   const { pop } = useNavigation();
   const isEditing = Boolean(props.profile);
 
   const defaults = useMemo(() => {
-    const initial: Record<string, string | boolean> = {};
+    const initial: DefaultValues = {
+      name: "",
+      globalMute: "inherit",
+      globalGain: "",
+      includeConnections: false,
+      muteByTargetId: {},
+      gainByTargetId: {},
+    };
     const existing = props.profile;
 
     initial.name = existing?.name ?? "";
     initial.globalMute = muteChoiceFromBool(existing?.global.mute);
     initial.globalGain =
       existing?.global.gain !== undefined ? String(existing.global.gain) : "";
-    initial.includeConnections =
-      existing?.routes && Object.keys(existing.routes).length > 0;
+    initial.includeConnections = Boolean(
+      existing?.routes && Object.keys(existing.routes).length > 0,
+    );
 
     for (const target of props.targets) {
       const override = target.identityKeys
         .map((key) => existing?.overrides[key])
         .find(Boolean);
-      initial[`mute:${target.id}`] = muteChoiceFromBool(override?.mute);
-      initial[`gain:${target.id}`] =
+      initial.muteByTargetId[target.id] = muteChoiceFromBool(override?.mute);
+      initial.gainByTargetId[target.id] =
         override?.gain !== undefined ? String(override.gain) : "";
     }
 
@@ -71,7 +99,7 @@ export function ProfileForm(props: Props) {
   }, [props.profile, props.targets]);
 
   async function onSubmit(values: FormValues) {
-    const name = (values.name ?? "").trim();
+    const name = stringValue(values.name).trim();
     if (name.length === 0) {
       await showToast({
         style: Toast.Style.Failure,
@@ -80,8 +108,8 @@ export function ProfileForm(props: Props) {
       return;
     }
 
-    const globalMute = boolFromMuteChoice(values.globalMute);
-    const rawGlobalGain = (values.globalGain ?? "").trim();
+    const globalMute = boolFromMuteChoice(stringValue(values.globalMute));
+    const rawGlobalGain = stringValue(values.globalGain).trim();
     const globalGain =
       rawGlobalGain.length > 0 ? parseGain(rawGlobalGain) : undefined;
     if (rawGlobalGain.length > 0 && globalGain === undefined) {
@@ -94,8 +122,10 @@ export function ProfileForm(props: Props) {
 
     const overrides: Record<string, ProfileTargetOverride> = {};
     for (const target of props.targets) {
-      const mute = boolFromMuteChoice(values[`mute:${target.id}`]);
-      const rawGain = (values[`gain:${target.id}`] ?? "").trim();
+      const mute = boolFromMuteChoice(
+        stringValue(values[`mute:${target.id}`]),
+      );
+      const rawGain = stringValue(values[`gain:${target.id}`]).trim();
       const gain = rawGain.length > 0 ? parseGain(rawGain) : undefined;
       if (rawGain.length > 0 && gain === undefined) {
         await showToast({
@@ -198,7 +228,7 @@ export function ProfileForm(props: Props) {
           key={`mute:${target.id}`}
           id={`mute:${target.id}`}
           title={`${target.name} Mute`}
-          defaultValue={defaults[`mute:${target.id}`]}
+          defaultValue={defaults.muteByTargetId[target.id]}
         >
           <Form.Dropdown.Item value="inherit" title="Inherit Global" />
           <Form.Dropdown.Item value="mute" title="Mute" />
@@ -211,7 +241,7 @@ export function ProfileForm(props: Props) {
           key={`gain:${target.id}`}
           id={`gain:${target.id}`}
           title={`${target.name} Gain (dB)`}
-          defaultValue={defaults[`gain:${target.id}`]}
+          defaultValue={defaults.gainByTargetId[target.id]}
         />
       ))}
     </Form>

@@ -70,15 +70,14 @@ function StripConnectionsView({
               title={bus.name}
               subtitle={connected ? "Connected" : "Not connected"}
               icon={{
-                source: connected ? Icon.Link : Icon.LinkDisabled,
+                source: connected ? Icon.Link : Icon.XMarkCircle,
                 tintColor: connected ? Color.Green : Color.SecondaryText,
               }}
               actions={
                 <ActionPanel>
                   <Action
                     title={connected ? "Disconnect" : "Connect"}
-                    icon={connected ? Icon.LinkDisabled : Icon.Link}
-                    shortcut={Keyboard.Shortcut.Common.Enter}
+                    icon={connected ? Icon.XMarkCircle : Icon.Link}
                     onAction={async () => {
                       const enabled = !connected;
                       const ok = await onConnectionChange(strip, bus, enabled);
@@ -99,7 +98,6 @@ function StripConnectionsView({
                   <Action
                     title="Back to Strips"
                     icon={Icon.ArrowLeft}
-                    shortcut={Keyboard.Shortcut.Common.Back}
                     onAction={pop}
                   />
                 </ActionPanel>
@@ -227,7 +225,6 @@ export default function Command() {
                 <Action.Push
                   title="Manage Routes"
                   icon={Icon.Link}
-                  shortcut={Keyboard.Shortcut.Common.Enter}
                   target={
                     <StripConnectionsView
                       stripId={strip.id}

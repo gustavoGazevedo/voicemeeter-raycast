@@ -2,6 +2,9 @@
 
 ## [Initial Release] - {PR_MERGE_DATE}
 
+- Fix Raycast API type errors in profile defaults and connection action shortcuts/icons
+- Fix Raycast runtime warnings by relying on primary actions for Enter and removing invalid `ActionPanel` string children
+- Load bundled `koffi` native bindings from `assets/native` so packaged Voicemeeter SDK access works reliably
 - Change Quick Settings shortcut from Cmd+, to Cmd+; (Raycast reserves Cmd+,)
 - Mute Channels: toggle, mute, and unmute Voicemeeter strips and buses
 - Adjust Volume: quick step controls and absolute dB input
