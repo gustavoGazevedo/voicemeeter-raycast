@@ -3,7 +3,6 @@ import {
   ActionPanel,
   Color,
   Icon,
-  Keyboard,
   List,
   useNavigation,
 } from "@raycast/api";
