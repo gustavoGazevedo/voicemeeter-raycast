@@ -32,6 +32,8 @@ declare namespace Preferences {
   export type Mute = ExtensionPreferences & {}
   /** Preferences accessible in the `volume` command */
   export type Volume = ExtensionPreferences & {}
+  /** Preferences accessible in the `connections` command */
+  export type Connections = ExtensionPreferences & {}
   /** Preferences accessible in the `profiles` command */
   export type Profiles = ExtensionPreferences & {}
   /** Preferences accessible in the `status` command */
@@ -43,6 +45,8 @@ declare namespace Arguments {
   export type Mute = {}
   /** Arguments passed to the `volume` command */
   export type Volume = {}
+  /** Arguments passed to the `connections` command */
+  export type Connections = {}
   /** Arguments passed to the `profiles` command */
   export type Profiles = {}
   /** Arguments passed to the `status` command */

@@ -21,7 +21,7 @@ interface Props {
   onSubmitProfile: (profile: ProfileDefinition) => Promise<void>;
 }
 
-type FormValues = Record<string, string>;
+type FormValues = Record<string, string | boolean>;
 
 function muteChoiceFromBool(value: boolean | undefined): string {
   if (value === true) {
@@ -48,13 +48,15 @@ export function ProfileForm(props: Props) {
   const isEditing = Boolean(props.profile);
 
   const defaults = useMemo(() => {
-    const initial: Record<string, string> = {};
+    const initial: Record<string, string | boolean> = {};
     const existing = props.profile;
 
     initial.name = existing?.name ?? "";
     initial.globalMute = muteChoiceFromBool(existing?.global.mute);
     initial.globalGain =
       existing?.global.gain !== undefined ? String(existing.global.gain) : "";
+    initial.includeConnections =
+      existing?.routes && Object.keys(existing.routes).length > 0;
 
     for (const target of props.targets) {
       const override = target.identityKeys
@@ -119,6 +121,15 @@ export function ProfileForm(props: Props) {
       }
     }
 
+    const includeConnections = Boolean(values.includeConnections);
+    const routes = includeConnections
+      ? Object.fromEntries(
+          props.targets
+            .filter((t) => t.kind === "strip" && t.routes)
+            .map((t) => [t.id, t.routes!]),
+        )
+      : undefined;
+
     const now = Date.now();
     const profile: ProfileDefinition = {
       id: props.profile?.id ?? makeId(),
@@ -130,6 +141,7 @@ export function ProfileForm(props: Props) {
         gain: globalGain,
       },
       overrides,
+      routes,
     };
 
     await props.onSubmitProfile(profile);
@@ -169,6 +181,13 @@ export function ProfileForm(props: Props) {
         id="globalGain"
         title="Global Gain (dB)"
         defaultValue={defaults.globalGain}
+      />
+
+      <Form.Checkbox
+        id="includeConnections"
+        title="Include Current Connections"
+        label="Save strip-to-bus routing (A1–A5, B1–B3) from current state"
+        defaultValue={defaults.includeConnections}
       />
 
       <Form.Separator />

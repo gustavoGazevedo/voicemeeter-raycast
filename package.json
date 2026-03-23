@@ -25,6 +25,13 @@
       "mode": "view"
     },
     {
+      "name": "connections",
+      "title": "Manage Connections",
+      "subtitle": "Voicemeeter",
+      "description": "Connect or disconnect strips to Voicemeeter buses.",
+      "mode": "view"
+    },
+    {
       "name": "profiles",
       "title": "Manage Profiles",
       "subtitle": "Voicemeeter",
