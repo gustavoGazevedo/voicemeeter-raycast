@@ -14,13 +14,18 @@ import {
   VoicemeeterTarget,
 } from "./types";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let koffi: any = null;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const savedResourcesPath = (process as any).resourcesPath;
 try {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (process as any).resourcesPath = path.join(environment.assetsPath, "native");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   koffi = require("koffi/indirect");
 } finally {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (process as any).resourcesPath = savedResourcesPath;
 }
 

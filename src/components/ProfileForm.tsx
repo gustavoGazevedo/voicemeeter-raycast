@@ -122,9 +122,7 @@ export function ProfileForm(props: Props) {
 
     const overrides: Record<string, ProfileTargetOverride> = {};
     for (const target of props.targets) {
-      const mute = boolFromMuteChoice(
-        stringValue(values[`mute:${target.id}`]),
-      );
+      const mute = boolFromMuteChoice(stringValue(values[`mute:${target.id}`]));
       const rawGain = stringValue(values[`gain:${target.id}`]).trim();
       const gain = rawGain.length > 0 ? parseGain(rawGain) : undefined;
       if (rawGain.length > 0 && gain === undefined) {
