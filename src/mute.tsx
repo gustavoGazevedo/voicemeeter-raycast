@@ -37,8 +37,8 @@ export default function Command() {
   async function handleToggle(target: VoicemeeterTarget) {
     const result = await toggleTargetMute(target);
     await notifyAction(result);
-  if (result.ok && result.newMute !== undefined) {
-    await applyCacheUpdate({ targetId: target.id, mute: result.newMute });
+    if (result.ok && result.newMute !== undefined) {
+      await applyCacheUpdate({ targetId: target.id, mute: result.newMute });
     } else {
       await refresh();
     }
